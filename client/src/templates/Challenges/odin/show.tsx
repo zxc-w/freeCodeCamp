@@ -13,10 +13,9 @@ import { Container, Col, Row, Button } from '@freecodecamp/ui';
 import ShortcutsModal from '../components/shortcuts-modal';
 
 // Local Utilities
-import Loader from '../../../components/helpers/loader';
 import Spacer from '../../../components/helpers/spacer';
 import LearnLayout from '../../../components/layouts/learn';
-import { ChallengeNode, ChallengeMeta } from '../../../redux/prop-types';
+import { ChallengeNode, ChallengeMeta, Test } from '../../../redux/prop-types';
 import Hotkeys from '../components/hotkeys';
 import VideoPlayer from '../components/video-player';
 import CompletionModal from '../components/completion-modal';
@@ -24,12 +23,14 @@ import HelpModal from '../components/help-modal';
 import Scene from '../components/scene/scene';
 import PrismFormatted from '../components/prism-formatted';
 import ChallengeTitle from '../components/challenge-title';
-import ChallengeHeading from '../components/challenge-heading';
+import MultipleChoiceQuestions from '../components/multiple-choice-questions';
+import Assignments from '../components/assignments';
 import {
   challengeMounted,
   updateChallengeMeta,
   openModal,
-  updateSolutionFormValues
+  updateSolutionFormValues,
+  initTests
 } from '../redux/actions';
 import { isChallengeCompletedSelector } from '../redux/selectors';
 
@@ -47,6 +48,7 @@ const mapStateToProps = createSelector(
 const mapDispatchToProps = (dispatch: Dispatch) =>
   bindActionCreators(
     {
+      initTests,
       updateChallengeMeta,
       challengeMounted,
       updateSolutionFormValues,
@@ -61,6 +63,7 @@ interface ShowOdinProps {
   challengeMounted: (arg0: string) => void;
   data: { challengeNode: ChallengeNode };
   description: string;
+  initTests: (xs: Test[]) => void;
   isChallengeCompleted: boolean;
   openCompletionModal: () => void;
   openHelpModal: () => void;
@@ -111,12 +114,19 @@ class ShowOdin extends Component<ShowOdinProps, ShowOdinState> {
       challengeMounted,
       data: {
         challengeNode: {
-          challenge: { title, challengeType, helpCategory }
+          challenge: {
+            fields: { tests },
+            title,
+            challengeType,
+            helpCategory
+          }
         }
       },
       pageContext: { challengeMeta },
+      initTests,
       updateChallengeMeta
     } = this.props;
+    initTests(tests);
     updateChallengeMeta({
       ...challengeMeta,
       title,
@@ -226,9 +236,8 @@ class ShowOdin extends Component<ShowOdinProps, ShowOdinState> {
             videoLocaleIds,
             bilibiliIds,
             fields: { blockName },
-            question: { text, answers, solution },
+            question,
             assignments,
-            audioPath,
             translationPending,
             scene
           }
@@ -247,10 +256,7 @@ class ShowOdin extends Component<ShowOdinProps, ShowOdinState> {
       `intro:${superBlock}.blocks.${block}.title`
     )} - ${title}`;
 
-    const feedback =
-      this.state.selectedOption !== null
-        ? answers[this.state.selectedOption].feedback
-        : undefined;
+    const { solution } = question;
 
     return (
       <Hotkeys
@@ -271,23 +277,17 @@ class ShowOdin extends Component<ShowOdinProps, ShowOdinState> {
               {videoId && (
                 <Col lg={10} lgOffset={1} md={10} mdOffset={1}>
                   <Spacer size='medium' />
-                  <div className='video-wrapper'>
-                    {!this.state.videoIsLoaded ? (
-                      <div className='video-placeholder-loader'>
-                        <Loader />
-                      </div>
-                    ) : null}
-                    <VideoPlayer
-                      bilibiliIds={bilibiliIds}
-                      onVideoLoad={this.onVideoLoad}
-                      title={title}
-                      videoId={videoId}
-                      videoIsLoaded={this.state.videoIsLoaded}
-                      videoLocaleIds={videoLocaleIds}
-                    />
-                  </div>
+                  <VideoPlayer
+                    bilibiliIds={bilibiliIds}
+                    onVideoLoad={this.onVideoLoad}
+                    title={title}
+                    videoId={videoId}
+                    videoIsLoaded={this.state.videoIsLoaded}
+                    videoLocaleIds={videoLocaleIds}
+                  />
                 </Col>
               )}
+
               <Col md={8} mdOffset={2} sm={10} smOffset={1} xs={12}>
                 <Spacer size='medium' />
                 <ChallengeTitle
@@ -298,119 +298,35 @@ class ShowOdin extends Component<ShowOdinProps, ShowOdinState> {
                 </ChallengeTitle>
                 <PrismFormatted className={'line-numbers'} text={description} />
                 <Spacer size='medium' />
-                {audioPath && (
-                  <>
-                    {/* TODO: Add tracks for audio elements */}
-                    {/* eslint-disable-next-line jsx-a11y/media-has-caption*/}
-                    <audio className='audio' controls>
-                      <source
-                        src={`https://cdn.freecodecamp.org/${audioPath}`}
-                        type='audio/mp3'
-                      />
-                    </audio>
-                    <Spacer size='medium' />
-                  </>
-                )}
               </Col>
 
               {scene && (
-                <>
-                  <Scene
-                    scene={scene}
-                    isPlaying={this.state.isScenePlaying}
-                    setIsPlaying={this.setIsScenePlaying}
-                  />{' '}
-                  <Spacer size='medium' />
-                </>
+                <Scene
+                  scene={scene}
+                  isPlaying={this.state.isScenePlaying}
+                  setIsPlaying={this.setIsScenePlaying}
+                />
               )}
 
               <Col md={8} mdOffset={2} sm={10} smOffset={1} xs={12}>
                 <ObserveKeys>
                   {assignments.length > 0 && (
-                    <>
-                      <ChallengeHeading heading={t('learn.assignments')} />
-                      <div className='video-quiz-options'>
-                        {assignments.map((assignment, index) => (
-                          <label
-                            className='video-quiz-option-label'
-                            key={index}
-                          >
-                            <input
-                              name='assignment'
-                              type='checkbox'
-                              onChange={event =>
-                                this.handleAssignmentChange(
-                                  event,
-                                  assignments.length
-                                )
-                              }
-                            />
-
-                            <PrismFormatted
-                              className={'video-quiz-option'}
-                              text={assignment}
-                            />
-                            <Spacer size='medium' />
-                          </label>
-                        ))}
-                      </div>{' '}
-                      <Spacer size='medium' />
-                    </>
+                    <Assignments
+                      assignments={assignments}
+                      allAssignmentsCompleted={
+                        this.state.allAssignmentsCompleted
+                      }
+                      handleAssignmentChange={this.handleAssignmentChange}
+                    />
                   )}
 
-                  <ChallengeHeading heading={t('learn.question')} />
-                  <PrismFormatted className={'line-numbers'} text={text} />
-                  <div className='video-quiz-options'>
-                    {answers.map(({ answer }, index) => (
-                      <label className='video-quiz-option-label' key={index}>
-                        <input
-                          aria-label={t('aria.answer')}
-                          checked={this.state.selectedOption === index}
-                          className='sr-only'
-                          name='quiz'
-                          onChange={this.handleOptionChange}
-                          type='radio'
-                          value={index}
-                        />{' '}
-                        <span className='video-quiz-input-visible'>
-                          {this.state.selectedOption === index ? (
-                            <span className='video-quiz-selected-input' />
-                          ) : null}
-                        </span>
-                        <PrismFormatted
-                          className={'video-quiz-option'}
-                          text={answer}
-                        />
-                      </label>
-                    ))}
-                  </div>
+                  <MultipleChoiceQuestions
+                    questions={question}
+                    selectedOption={this.state.selectedOption}
+                    isWrongAnswer={this.state.isWrongAnswer}
+                    handleOptionChange={this.handleOptionChange}
+                  />
                 </ObserveKeys>
-                <Spacer size='medium' />
-                <div
-                  style={{
-                    textAlign: 'center'
-                  }}
-                >
-                  {this.state.isWrongAnswer && (
-                    <span>
-                      {feedback ? (
-                        <PrismFormatted
-                          className={'multiple-choice-feedback'}
-                          text={feedback}
-                        />
-                      ) : (
-                        t('learn.wrong-answer')
-                      )}
-                    </span>
-                  )}
-                  {!this.state.allAssignmentsCompleted &&
-                    assignments.length > 0 && (
-                      <>
-                        <br />
-                        <span>{t('learn.assignment-not-complete')}</span>
-                      </>
-                    )}
-                </div>
                 <Spacer size='medium' />
                 <Button
                   block={true}
@@ -456,8 +372,8 @@ export default connect(
 )(withTranslation()(ShowOdin));
 
 export const query = graphql`
-  query TheOdinProject($slug: String!) {
-    challengeNode(challenge: { fields: { slug: { eq: $slug } } }) {
+  query TheOdinProject($id: String!) {
+    challengeNode(id: { eq: $id }) {
       challenge {
         videoId
         videoLocaleIds {
@@ -479,6 +395,10 @@ export const query = graphql`
         fields {
           slug
           blockName
+          tests {
+            text
+            testString
+          }
         }
         question {
           text
@@ -527,7 +447,6 @@ export const query = graphql`
         }
         translationPending
         assignments
-        audioPath
       }
     }
   }

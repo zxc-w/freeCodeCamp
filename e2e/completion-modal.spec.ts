@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import translations from '../client/i18n/locales/english/translations.json';
+import { authedRequest } from './utils/request';
 
 const nextChallengeURL =
   '/learn/data-analysis-with-python/data-analysis-with-python-projects/demographic-data-analyzer';
@@ -31,6 +32,39 @@ test.describe('Challenge Completion Modal Tests (Signed Out)', () => {
   test('should close the modal after user click on close', async ({ page }) => {
     await page.getByRole('button', { name: 'close' }).click();
     await expect(page.getByTestId('completion-success-icon')).not.toBeVisible();
+  });
+
+  test('should close the modal after user presses escape', async ({ page }) => {
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('should display the text of go to next challenge button accordingly based on device type', async ({
+    page,
+    isMobile,
+    browserName
+  }) => {
+    if (isMobile) {
+      await expect(
+        page.getByRole('button', {
+          name: 'Go to next challenge',
+          exact: true
+        })
+      ).toBeVisible();
+    } else if (browserName === 'webkit') {
+      await expect(
+        page.getByRole('button', {
+          name: 'Go to next challenge (Command + Enter)'
+        })
+      ).toBeVisible();
+    } else {
+      await expect(
+        page.getByRole('button', {
+          name: 'Go to next challenge (Ctrl + Enter)'
+        })
+      ).toBeVisible();
+    }
   });
 
   test('should redirect to /learn after sign in', async ({ page }) => {
@@ -67,6 +101,67 @@ test.describe('Challenge Completion Modal Tests (Signed In)', () => {
   test('should close the modal after user click on close', async ({ page }) => {
     await page.getByRole('button', { name: 'close' }).click();
     await expect(page.getByTestId('completion-success-icon')).not.toBeVisible();
+  });
+
+  test('should close the modal after user presses escape while having keyboard shortcuts disabled', async ({
+    page,
+    request
+  }) => {
+    await authedRequest({
+      request,
+      endpoint: 'update-my-keyboard-shortcuts',
+      method: 'put',
+      data: {
+        keyboardShortcuts: false
+      }
+    });
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+  });
+
+  test('should close the modal after user presses escape while having keyboard shortcuts enabled', async ({
+    page,
+    request
+  }) => {
+    await authedRequest({
+      request,
+      endpoint: 'update-my-keyboard-shortcuts',
+      method: 'put',
+      data: {
+        keyboardShortcuts: true
+      }
+    });
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toBeVisible();
+  });
+
+  test('should display the text of go to next challenge button accordingly based on device type', async ({
+    page,
+    isMobile,
+    browserName
+  }) => {
+    if (isMobile) {
+      await expect(
+        page.getByRole('button', {
+          name: 'Submit and go to next challenge',
+          exact: true
+        })
+      ).toBeVisible();
+    } else if (browserName === 'webkit') {
+      await expect(
+        page.getByRole('button', {
+          name: 'Submit and go to next challenge (Command + Enter)'
+        })
+      ).toBeVisible();
+    } else {
+      await expect(
+        page.getByRole('button', {
+          name: 'Submit and go to next challenge (Ctrl + Enter)'
+        })
+      ).toBeVisible();
+    }
   });
 
   test('should submit and go to the next challenge when the user clicks the submit button', async ({

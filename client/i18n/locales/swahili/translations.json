@@ -1,6 +1,7 @@
 {
   "buttons": {
     "logged-in-cta-btn": "Anza hapa (ni bure)",
+    "get-started": "Get Started",
     "logged-out-cta-btn": "Ingia katika akaunti ili kuhifadhi maendeleo yako (ni bure)",
     "view-curriculum": "Tazama Mtaala",
     "first-lesson": "Nenda kwenye somo la kwanza",
@@ -55,9 +56,9 @@
     "reset-lesson": "Anza upya somo hili",
     "run": "Anzisha",
     "run-test": "Endesha Majaribio (Ctrl + Enter)",
-    "check-code": "Angalia Code yako (Ctrl + Enter)",
-    "check-code-2": "Angalia Code Yako",
-    "check-code-3": "Check Your Code (Command + Enter)",
+    "check-code": "Check Your Code",
+    "check-code-ctrl": "Check Your Code (Ctrl + Enter)",
+    "check-code-cmd": "Check Your Code (Command + Enter)",
     "reset": "Anzisha Upya",
     "reset-step": "Weka Upya Hatua Hii",
     "help": "Msaada",
@@ -67,12 +68,17 @@
     "click-here": "Bofya hapa ili kuingia",
     "save": "Hifadhi",
     "save-code": "Hifadhi Code yako",
+    "show-demo": "Show Demo",
     "no-thanks": "Hapana asante",
     "yes-please": "Ndio tafadhali",
     "update-email": "Sasisha Barua pepe yangu",
     "verify-email": "Thibitisha Barua pepe",
     "submit-and-go": "Wasilisha na uende kwa changamoto inayofuata",
+    "submit-and-go-ctrl": "Submit and go to next challenge (Ctrl + Enter)",
+    "submit-and-go-cmd": "Submit and go to next challenge (Command + Enter)",
     "go-to-next": "Nenda kwenye changamoto inayofuata",
+    "go-to-next-ctrl": "Go to next challenge (Ctrl + Enter)",
+    "go-to-next-cmd": "Go to next challenge (Command + Enter)",
     "ask-later": "Niulize baadaye",
     "start-coding": "Anza kusimba!",
     "go-to-settings": "Nenda kwenye mipangilio ili kudai uidhinishaji wako",
@@ -96,16 +102,20 @@
     "update-card": "Update your card",
     "donate-now": "Donate Now",
     "confirm-amount": "Confirm amount",
-    "skip-advertisement": "Skip Advertisement",
-    "play-scene": "Press Play"
+    "play-scene": "Press Play",
+    "closed-caption": "Closed caption"
   },
   "landing": {
     "big-heading-1": "Jifunze kuandika code - bila malipo.",
+    "big-heading-1-b": "Learn to code.",
     "big-heading-2": "Unda miradi.",
     "big-heading-3": "Pata vyeti.",
+    "big-heading-4": "All for free.",
     "h2-heading": "Tangu 2014, zaidi ya wahitimu 40,000 wa freeCodeCamp.org wamepata kazi katika kampuni za teknolojia ikijumuisha:",
+    "h2-heading-b": "More than 100,000 freeCodeCamp.org graduates have gotten jobs at tech companies including:",
     "hero-img-description": "wanafunzi wa freeCodeCamp katika kikundi cha mafunzo nchini Korea Kusini.",
     "hero-img-alt": "A group of people, including a White man, a Black woman, and an Asian woman, gathered around a laptop.",
+    "hero-img-uis": "A group of screenshots showing the freeCodeCamp editor interface on both a mobile and desktop device and a certification.",
     "as-seen-in": "Kama inavyoonekana katika:",
     "testimonials": {
       "heading": "Hivi ndivyo wahitimu wetu wanasema kuhusu freeCodeCamp:",
@@ -270,7 +280,10 @@
       "reset-p2": "You will effectively be set back to the very first day you signed up.",
       "reset-p3": "We won't be able to recover any of it for you later, even if you change your mind.",
       "nevermind-2": "Usijali, sitaki kufuta maendeleo yangu yote",
-      "reset-confirm": "Weka upya kila kitu. Nataka kuanza tena mwanzo"
+      "reset-confirm": "Weka upya kila kitu. Nataka kuanza tena mwanzo",
+      "verify-text": "To verify, type \"{{ verifyText }}\" below:",
+      "verify-reset-text": "I agree that all progress will be lost",
+      "verify-delete-text": "I agree to delete my account"
     },
     "email": {
       "missing": "Huna barua pepe inayohusishwa na akaunti hii.",
@@ -293,17 +306,20 @@
     }
   },
   "profile": {
-    "you-not-public": "Hujaweka wazi portfolio yako.",
-    "username-not-public": "{{username}} hajaweka wazi portfolio yao.",
     "you-change-privacy": "Unahitaji kubadilisha mpangilio wako wa faragha ili portfolio yako ionekane na wengine. Hili ni onyesho la kukagua jinsi wasifu yako itakavyoonekana ikifanywa kwa umma.",
     "username-change-privacy": "{{username}} anahitaji kubadilisha mipangilio yake ya faragha ili uweze kutazama portfolio yake.",
     "supporter": "Msaidizi",
     "contributor": "Mchangiaji Mkuu",
+    "contributor-prolific": "Among most prolific volunteers in {{year}}",
     "no-certs": "Hakuna vyeti vimepatikana chini ya mtaala wa sasa",
     "fcc-certs": "Udhibitisho wa freeCodeCamp",
     "longest-streak": "Msururu mrefu zaidi:",
     "current-streak": "Mfululizo wa Sasa:",
-    "portfolio": "Wasifu",
+    "portfolio": "Portfolio",
+    "badges": "Badges",
+    "donated": "Donated to the community",
+    "projects": "Projects",
+    "stats": "Stats",
     "timeline": "Rekodi ya matukio",
     "none-completed": "Hakuna changamoto zilizokamilishwa bado.",
     "get-started": "Anza hapa.",
@@ -314,6 +330,7 @@
     "tweet": "Nimejishindia cheti cha {{certTitle}} @freeCodeCamp! Iangalie hapa: {{certURL}}",
     "avatar": "Ishara ya {{username}}",
     "joined": "Umejiunga {{date}}",
+    "from": "From {{location}}",
     "total-points": "Total Points:",
     "points": "Pointi {{count}} mnamo {{date}}",
     "points_plural": "Alama {{count}} mnamo {{date}}",
@@ -368,7 +385,7 @@
     "add-subtitles": "Saidia kuboresha au kuongeza manukuu",
     "wrong-answer": "Samahani, hilo si jibu sahihi. Jaribu tena?",
     "check-answer": "Bofya kitufe kilicho hapa chini ili kuangalia jibu lako.",
-    "assignment-not-complete": "Tafadhali maliza kazi",
+    "assignment-not-complete": "Please complete the assignments",
     "assignments": "Kazi",
     "question": "Swali",
     "solution-link": "Kiungo cha Suluhisho",
@@ -377,6 +394,7 @@
     "submit-and-go": "Wasilisha na uende kwa changamoto inayofuata",
     "congratulations": "Hongera, code yako imepita. Wasilisha code yako ili kuendelea.",
     "i-completed": "Nimemaliza changamoto hii",
+    "example-code": "Example Code",
     "test-output": "Matokeo ya jaribio lako yataenda hapa",
     "running-tests": "// kufanya majaribio",
     "tests-completed": "// majaribio yamekamilika",
@@ -399,10 +417,11 @@
     "rsa-forum": "<strong>Before making a new post</strong> please <0>check if your question has already been answered on the forum</0>.",
     "reset": "Anza upya somo hili?",
     "reset-warn": "Je, una uhakika ungependa kuanza upya somo hili? Vihariri na majaribio vitawekwa upya.",
-    "reset-warn-2": "Hili haliwezi kutenduliwa",
+    "reset-warn-2": "This cannot be undone.",
     "scrimba-tip": "Kidokezo: Ikiwa kivinjari kidogo kinafunika msimbo, bofya na uburute ili kuisogeza. Pia, jisikie huru kusimamisha na kuhariri msimbo katika video wakati wowote.",
     "chal-preview": "Hakiki Changamoto",
     "donation-record-not-found": "Your donation record has not been found.",
+    "donation-heading": "Progress towards donation goal",
     "sign-in-card-update": "Sign in to update your card",
     "sign-in-see-benefits": "Sign in to see your supporter benefits",
     "card-has-been-updated": "Your card has been updated successfully.",
@@ -502,6 +521,14 @@
       "link-li-6": "Click \"Link Account\" to link your Microsoft username.",
       "transcript-label": "Your Microsoft Transcript Link",
       "invalid-transcript": "Your transcript link is not correct, it should have the following form: <1>https://learn.microsoft.com/LOCALE/users/USERNAME/transcript/ID</1> - check the UPPERCASE items in your link are correct."
+    },
+    "blockType": {
+      "lecture": "Lecture",
+      "workshop": "Workshop",
+      "lab": "Lab",
+      "review": "Review",
+      "quiz": "Quiz",
+      "exam": "Exam"
     }
   },
   "donate": {
@@ -566,6 +593,7 @@
     "other-ways": "Hapa kuna <0>njia zingine nyingi unazoweza kusaidia dhamira yetu ya kutoa msaada</0>.",
     "if-support-further": "If you want to support our charity further, please consider <0>making a one-time donation</0>, <1>sending us a check</1>, or <2>learning about other ways you could support our charity.</2>",
     "failed-pay": "Uh - oh. Inaonekana muamala wako haukutekelezwa. Je, unaweza kujaribu tena?",
+    "try-another-method": "Uh - oh. It looks like your transaction didn't go through. Could you please try another payment method?",
     "try-again": "Tafadhali jaribu tena.",
     "card-number": "Nambari ya Kadi yako:",
     "expiration": "Tarehe ya kumalizika muda wake:",
@@ -602,7 +630,7 @@
     "welcome-stock": "Tunakaribisha michango yako ya hisa. Tafadhali tuma barua pepe kwa Quincy moja kwa moja na anaweza kukusaidia kwa hili, na kushiriki maelezo ya akaunti yetu ya udalali ya hisani: quincy@freecodecamp.org.",
     "how-receipt": "Je, ninaweza kupata risiti ya mchango ili niweze kutoa mchango wangu kutoka kwa kodi zangu?",
     "just-forward": "Kabisa. Sambaza tu risiti yako kwa donors@freecodecamp.org, tuambie ungependa risiti na maagizo yoyote maalum ambayo unaweza kuwa nayo, nasi tutakujibu pamoja na risiti.",
-    "how-update": "Ninaanzisha mchango wa kila mwezi, lakini ninahitaji kusasisha au kusitisha ujirudiaji wa kila mwezi. Ninawezaje kufanya hili?",
+    "how-update": "I set up a monthly donation, but I need to update or stop the monthly recurrence. How can I do this?",
     "take-care-of-this": "Tuma moja ya risiti zako za michango ya kila mwezi kwa donors@freecodecamp.org na utuambie kile ungependa tufanye. Tutakushughulikia na kukutumia uthibitisho.",
     "anything-else": "Kuna kitu kingine chochote ninachoweza kujifunza kuhusu kuchangia freeCodeCamp.org?",
     "other-support": "Ikiwa kuna njia nyingine ungependa kusaidia shirika letu la kutoa msaada na dhamira yake ambayo haijaorodheshwa hapa, au ikiwa una maswali yoyote, tafadhali tuma barua pepe kwa Quincy kupitia quincy@freecodecamp.org.",
@@ -636,7 +664,8 @@
     "help-millions-learn": "Help millions of people learn",
     "reach-goals-faster": "Reach your goals faster",
     "remove-distractions": "Remove distractions",
-    "animation-description": "This is a 20 second animated advertisement to encourage campers to become supporters of freeCodeCamp. The animation starts with a teddy bear who becomes a supporter. As a result, distracting pop-ups disappear and the bear gets to complete all of its goals. Then, it graduates and becomes an education super hero helping people around the world."
+    "animation-description": "This is a 20 second animated advertisement to encourage campers to become supporters of freeCodeCamp. The animation starts with a teddy bear who becomes a supporter. As a result, distracting pop-ups disappear and the bear gets to complete all of its goals. Then, it graduates and becomes an education super hero helping people around the world.",
+    "animation-countdown": "This animation will stop after {{secondsRemaining}} seconds."
   },
   "report": {
     "sign-in": "Unahitaji kuingia ili kuripoti mtumiaji",
@@ -659,7 +688,8 @@
     "see-results": "Tazama matokeo yote ya {{searchQuery}}",
     "no-tutorials": "Hakuna mafunzo yaliyopatikana",
     "try": "Unatafuta kitu? Jaribu upau wa kutafutia kwenye ukurasa huu.",
-    "no-results": "Hatukuweza kupata chochote kinachohusiana na <0>{{query}}</0>"
+    "no-results": "Hatukuweza kupata chochote kinachohusiana na <0>{{query}}</0>",
+    "result-list": "Search results"
   },
   "misc": {
     "offline": "Unaonekana kuwa nje ya mtandao, huenda maendeleo yako yasihifadhiwe",
@@ -719,6 +749,7 @@
     "last-page": "Nenda kwenye ukurasa wa mwisho",
     "primary-nav": "msingi",
     "breadcrumb-nav": "breadcrumb",
+    "timeline-pagination-nav": "Timeline Pagination",
     "submit": "Tumia Ctrl + Enter kuwasilisha.",
     "running-tests": "Kuendesha majaribio",
     "hide-preview": "Ficha onyesho la kukagua",
@@ -740,7 +771,7 @@
   "flash": {
     "honest-first": "Ili kudai uthibitisho, lazima kwanza ukubali sera yetu ya uaminifu kitaaluma",
     "really-weird": "Kitu cha ajabu kilifanyika, ikiwa kitatokea tena, tafadhali zingatia kuibua suala kwenye https://github.com/freeCodeCamp/freeCodeCamp/issues/new",
-    "not-right": "Kitu si sawa kabisa. Ripoti imetolewa na timu ya freeCodeCamp.org imearifiwa",
+    "generic-error": "Something went wrong. Please try again in a moment or contact support@freecodecamp.org if the error persists.",
     "went-wrong": "Hitilafu fulani imetokea, tafadhali angalia na ujaribu tena",
     "account-deleted": "Akaunti yako imefutwa",
     "progress-reset": "Maendeleo yako yamewekwa upya",
@@ -776,7 +807,6 @@
     "cert-claim-success": "@{{username}}, umefanikiwa kudai Cheti cha {{name}}! Hongera kwa niaba ya timu ya freeCodeCamp.org!",
     "wrong-name": "Hitilafu fulani imetokea katika uthibitishaji wa {{name}}, tafadhali jaribu tena. Ukiendelea kupokea hitilafu hii, unaweza kutuma ujumbe kwa support@freeCodeCamp.org ili kupata usaidizi.",
     "error-claiming": "Hitilafu katika kudai {{certName}}",
-    "refresh-needed": "Unaweza kutumia kitufe cha PaymentRequest mara moja pekee. Onyesha upya ukurasa ili kuanza upya.",
     "username-not-found": "Hatukuweza kupata mtumiaji aliye na jina la mtumiaji \"{{username}}\"",
     "add-name": "Mtumiaji huyu anahitaji kuongeza jina lake kwenye akaunti yake ili wengine waweze kuona uthibitishaji wake.",
     "not-eligible": "Mtumiaji huyu hastahiki uthibitishaji wa freeCodeCamp.org kwa wakati huu.",
@@ -860,7 +890,8 @@
     "own-work-url": "Kumbuka kuwasilisha kazi yako mwenyewe.",
     "publicly-visible-url": "Kumbuka kuwasilisha URL ya programu inayoonekana hadharani.",
     "ms-learn-link": "Tafadhali tumia kiungo halali cha kombe la Microsoft Learn.",
-    "path-url": "Labda unataka kuwasilisha njia ya mizizi yaani https://example.com, sio https://example.com/path"
+    "path-url": "Labda unataka kuwasilisha njia ya mizizi yaani https://example.com, sio https://example.com/path",
+    "source-code-link-required": "Remember to submit the link to your source code."
   },
   "certification": {
     "executive": "Mkurugenzi Mtendaji, freeCodeCamp.org",
@@ -984,6 +1015,10 @@
       "foundational-c-sharp-with-microsoft": "Msingi C# na Cheti cha Microsoft",
       "A2 English for Developers": "A2 English for Developers",
       "a2-english-for-developers": "A2 English for Developers Certification",
+      "B1 English for Developers": "B1 English for Developers",
+      "b1-english-for-developers": "B1 English for Developers Certification",
+      "Front End Development": "Front End Development",
+      "front-end-development-v9": "Front End Development Certification",
       "Legacy Front End": "Legacy Front End",
       "legacy-front-end": "Legacy Front End Certification",
       "Legacy Back End": "Legacy Back End",

@@ -16,9 +16,9 @@ import { CompletedChallenge } from '../../../redux/prop-types';
 import ProjectPreviewModal from '../../../templates/Challenges/components/project-preview-modal';
 import ExamResultsModal from '../../SolutionViewer/exam-results-modal';
 import { openModal } from '../../../templates/Challenges/redux/actions';
-import { Link, FullWidthRow } from '../../helpers';
+import { Link, FullWidthRow, Spacer } from '../../helpers';
 import { SolutionDisplayWidget } from '../../solution-display-widget';
-import { SuperBlocks } from '../../../../../shared/config/superblocks';
+import { SuperBlocks } from '../../../../../shared/config/curriculum';
 import TimelinePagination from './timeline-pagination';
 
 const SolutionViewer = Loadable(
@@ -176,7 +176,8 @@ function TimelineInner({
 
   return (
     <FullWidthRow>
-      <h2 className='text-center'>{t('profile.timeline')}</h2>
+      <h2>{t('profile.timeline')}</h2>
+      <Spacer size='small' />
       {completedMap.length === 0 ? (
         <p className='text-center'>
           {t('profile.none-completed')}&nbsp;
@@ -197,13 +198,13 @@ function TimelineInner({
         </Table>
       )}
       {id && (
-        <Modal onClose={closeSolution} open={solutionOpen}>
+        <Modal onClose={closeSolution} open={solutionOpen} size='large'>
           <Modal.Header showCloseButton={true} closeButtonClassNames='close'>
             {`${username}'s Solution to ${
               idToNameMap.get(id)?.challengeTitle ?? ''
             }`}
           </Modal.Header>
-          <Modal.Body>
+          <Modal.Body alignment='left'>
             <SolutionViewer
               challengeFiles={challengeData.challengeFiles}
               solution={challengeData.solution ?? ''}
@@ -228,7 +229,6 @@ function TimelineInner({
         challengeData={challengeData}
         closeText={t('buttons.close')}
         previewTitle={projectTitle}
-        showProjectPreview={true}
       />
       <ExamResultsModal
         projectTitle={projectTitle}

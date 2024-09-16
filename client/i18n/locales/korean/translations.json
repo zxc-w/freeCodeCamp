@@ -1,6 +1,7 @@
 {
   "buttons": {
     "logged-in-cta-btn": "Get started (it's free)",
+    "get-started": "Get Started",
     "logged-out-cta-btn": "Sign in to save your progress (it's free)",
     "view-curriculum": "View the Curriculum",
     "first-lesson": "Go to the first lesson",
@@ -55,9 +56,9 @@
     "reset-lesson": "Reset this lesson",
     "run": "Run",
     "run-test": "Run the Tests (Ctrl + Enter)",
-    "check-code": "Check Your Code (Ctrl + Enter)",
-    "check-code-2": "Check Your Code",
-    "check-code-3": "Check Your Code (Command + Enter)",
+    "check-code": "Check Your Code",
+    "check-code-ctrl": "Check Your Code (Ctrl + Enter)",
+    "check-code-cmd": "Check Your Code (Command + Enter)",
     "reset": "Reset",
     "reset-step": "Reset This Step",
     "help": "Help",
@@ -67,12 +68,17 @@
     "click-here": "Click here to sign in",
     "save": "Save",
     "save-code": "Save your Code",
+    "show-demo": "Show Demo",
     "no-thanks": "No thanks",
     "yes-please": "Yes please",
     "update-email": "Update my Email",
     "verify-email": "Verify Email",
     "submit-and-go": "Submit and go to next challenge",
+    "submit-and-go-ctrl": "Submit and go to next challenge (Ctrl + Enter)",
+    "submit-and-go-cmd": "Submit and go to next challenge (Command + Enter)",
     "go-to-next": "Go to next challenge",
+    "go-to-next-ctrl": "Go to next challenge (Ctrl + Enter)",
+    "go-to-next-cmd": "Go to next challenge (Command + Enter)",
     "ask-later": "Ask me later",
     "start-coding": "Start coding!",
     "go-to-settings": "Go to settings to claim your certification",
@@ -96,16 +102,20 @@
     "update-card": "Update your card",
     "donate-now": "Donate Now",
     "confirm-amount": "Confirm amount",
-    "skip-advertisement": "Skip Advertisement",
-    "play-scene": "Press Play"
+    "play-scene": "Press Play",
+    "closed-caption": "Closed caption"
   },
   "landing": {
     "big-heading-1": "Learn to code — for free.",
+    "big-heading-1-b": "Learn to code.",
     "big-heading-2": "Build projects.",
     "big-heading-3": "Earn certifications.",
+    "big-heading-4": "All for free.",
     "h2-heading": "Since 2014, more than 40,000 freeCodeCamp.org graduates have gotten jobs at tech companies including:",
+    "h2-heading-b": "More than 100,000 freeCodeCamp.org graduates have gotten jobs at tech companies including:",
     "hero-img-description": "freeCodeCamp students at a local study group in South Korea.",
     "hero-img-alt": "A group of people, including a White man, a Black woman, and an Asian woman, gathered around a laptop.",
+    "hero-img-uis": "A group of screenshots showing the freeCodeCamp editor interface on both a mobile and desktop device and a certification.",
     "as-seen-in": "As seen in:",
     "testimonials": {
       "heading": "Here is what our alumni say about freeCodeCamp:",
@@ -270,7 +280,10 @@
       "reset-p2": "You will effectively be set back to the very first day you signed up.",
       "reset-p3": "We won't be able to recover any of it for you later, even if you change your mind.",
       "nevermind-2": "Nevermind, I don't want to delete all of my progress",
-      "reset-confirm": "Reset everything. I want to start from the beginning"
+      "reset-confirm": "Reset everything. I want to start from the beginning",
+      "verify-text": "To verify, type \"{{ verifyText }}\" below:",
+      "verify-reset-text": "I agree that all progress will be lost",
+      "verify-delete-text": "I agree to delete my account"
     },
     "email": {
       "missing": "You do not have an email associated with this account.",
@@ -293,17 +306,20 @@
     }
   },
   "profile": {
-    "you-not-public": "You have not made your portfolio public.",
-    "username-not-public": "{{username}} has not made their portfolio public.",
     "you-change-privacy": "You need to change your privacy setting in order for your portfolio to be seen by others. This is a preview of how your portfolio will look when made public.",
     "username-change-privacy": "{{username}} needs to change their privacy setting in order for you to view their portfolio.",
     "supporter": "Supporter",
     "contributor": "Top Contributor",
+    "contributor-prolific": "Among most prolific volunteers in {{year}}",
     "no-certs": "No certifications have been earned under the current curriculum",
     "fcc-certs": "freeCodeCamp Certifications",
     "longest-streak": "Longest Streak:",
     "current-streak": "Current Streak:",
     "portfolio": "Portfolio",
+    "badges": "Badges",
+    "donated": "Donated to the community",
+    "projects": "Projects",
+    "stats": "Stats",
     "timeline": "Timeline",
     "none-completed": "No challenges have been completed yet.",
     "get-started": "Get started here.",
@@ -314,6 +330,7 @@
     "tweet": "I just earned the {{certTitle}} certification @freeCodeCamp! Check it out here: {{certURL}}",
     "avatar": "{{username}}'s avatar",
     "joined": "Joined {{date}}",
+    "from": "From {{location}}",
     "total-points": "Total Points:",
     "points": "{{count}} point on {{date}}",
     "points_plural": "{{count}} points on {{date}}",
@@ -368,7 +385,7 @@
     "add-subtitles": "Help improve or add subtitles",
     "wrong-answer": "Sorry, that's not the right answer. Give it another try?",
     "check-answer": "Click the button below to check your answer.",
-    "assignment-not-complete": "Please finish the assignments",
+    "assignment-not-complete": "Please complete the assignments",
     "assignments": "Assignments",
     "question": "Question",
     "solution-link": "Solution Link",
@@ -377,6 +394,7 @@
     "submit-and-go": "Submit and go to my next challenge",
     "congratulations": "Congratulations, your code passes. Submit your code to continue.",
     "i-completed": "I've completed this challenge",
+    "example-code": "Example Code",
     "test-output": "Your test output will go here",
     "running-tests": "// running tests",
     "tests-completed": "// tests completed",
@@ -399,10 +417,11 @@
     "rsa-forum": "<strong>Before making a new post</strong> please <0>check if your question has already been answered on the forum</0>.",
     "reset": "Reset this lesson?",
     "reset-warn": "Are you sure you wish to reset this lesson? The editors and tests will be reset.",
-    "reset-warn-2": "This cannot be undone",
+    "reset-warn-2": "This cannot be undone.",
     "scrimba-tip": "Tip: If the mini-browser is covering the code, click and drag to move it. Also, feel free to stop and edit the code in the video at any time.",
     "chal-preview": "Challenge Preview",
     "donation-record-not-found": "Your donation record has not been found.",
+    "donation-heading": "Progress towards donation goal",
     "sign-in-card-update": "Sign in to update your card",
     "sign-in-see-benefits": "Sign in to see your supporter benefits",
     "card-has-been-updated": "Your card has been updated successfully.",
@@ -502,6 +521,14 @@
       "link-li-6": "Click \"Link Account\" to link your Microsoft username.",
       "transcript-label": "Your Microsoft Transcript Link",
       "invalid-transcript": "Your transcript link is not correct, it should have the following form: <1>https://learn.microsoft.com/LOCALE/users/USERNAME/transcript/ID</1> - check the UPPERCASE items in your link are correct."
+    },
+    "blockType": {
+      "lecture": "Lecture",
+      "workshop": "Workshop",
+      "lab": "Lab",
+      "review": "Review",
+      "quiz": "Quiz",
+      "exam": "Exam"
     }
   },
   "donate": {
@@ -566,6 +593,7 @@
     "other-ways": "Here are many <0>other ways you can support our charity's mission</0>.",
     "if-support-further": "If you want to support our charity further, please consider <0>making a one-time donation</0>, <1>sending us a check</1>, or <2>learning about other ways you could support our charity.</2>",
     "failed-pay": "Uh - oh. It looks like your transaction didn't go through. Could you please try again?",
+    "try-another-method": "Uh - oh. It looks like your transaction didn't go through. Could you please try another payment method?",
     "try-again": "Please try again.",
     "card-number": "Your Card Number:",
     "expiration": "Expiration Date:",
@@ -602,7 +630,7 @@
     "welcome-stock": "We would welcome your stock donations. Please email Quincy directly and he can help you with this, and share our charity's brokerage account details: quincy@freecodecamp.org.",
     "how-receipt": "Can I get a donation receipt so that I can deduct my donation from my taxes?",
     "just-forward": "Absolutely. Just forward the receipt from your transaction to donors@freecodecamp.org, tell us you'd like a receipt and any special instructions you may have, and we'll reply with a receipt for you.",
-    "how-update": "I set up a monthly donation, but I need to update or pause the monthly recurrence. How can I do this?",
+    "how-update": "I set up a monthly donation, but I need to update or stop the monthly recurrence. How can I do this?",
     "take-care-of-this": "Just forward one of your monthly donation receipts to donors@freecodecamp.org and tell us what you'd like us to do. We'll take care of this for you and send you confirmation.",
     "anything-else": "Is there anything else I can learn about donating to freeCodeCamp.org?",
     "other-support": "If there is some other way you'd like to support our charity and its mission that isn't listed here, or if you have any questions at all, please email Quincy at quincy@freecodecamp.org.",
@@ -636,7 +664,8 @@
     "help-millions-learn": "Help millions of people learn",
     "reach-goals-faster": "Reach your goals faster",
     "remove-distractions": "Remove distractions",
-    "animation-description": "This is a 20 second animated advertisement to encourage campers to become supporters of freeCodeCamp. The animation starts with a teddy bear who becomes a supporter. As a result, distracting pop-ups disappear and the bear gets to complete all of its goals. Then, it graduates and becomes an education super hero helping people around the world."
+    "animation-description": "This is a 20 second animated advertisement to encourage campers to become supporters of freeCodeCamp. The animation starts with a teddy bear who becomes a supporter. As a result, distracting pop-ups disappear and the bear gets to complete all of its goals. Then, it graduates and becomes an education super hero helping people around the world.",
+    "animation-countdown": "This animation will stop after {{secondsRemaining}} seconds."
   },
   "report": {
     "sign-in": "You need to be signed in to report a user",
@@ -659,7 +688,8 @@
     "see-results": "See all results for {{searchQuery}}",
     "no-tutorials": "No tutorials found",
     "try": "Looking for something? Try the search bar on this page.",
-    "no-results": "We could not find anything relating to <0>{{query}}</0>"
+    "no-results": "We could not find anything relating to <0>{{query}}</0>",
+    "result-list": "Search results"
   },
   "misc": {
     "offline": "You appear to be offline, your progress may not be saved",
@@ -719,6 +749,7 @@
     "last-page": "Go to last page",
     "primary-nav": "primary",
     "breadcrumb-nav": "breadcrumb",
+    "timeline-pagination-nav": "Timeline Pagination",
     "submit": "Use Ctrl + Enter to submit.",
     "running-tests": "Running tests",
     "hide-preview": "Hide the preview",
@@ -740,7 +771,7 @@
   "flash": {
     "honest-first": "To claim a certification, you must first agree to our academic honesty policy",
     "really-weird": "Something really weird happened, if it happens again, please consider raising an issue on https://github.com/freeCodeCamp/freeCodeCamp/issues/new",
-    "not-right": "Something is not quite right. A report has been generated and the freeCodeCamp.org team have been notified",
+    "generic-error": "Something went wrong. Please try again in a moment or contact support@freecodecamp.org if the error persists.",
     "went-wrong": "Something went wrong, please check and try again",
     "account-deleted": "Your account has been successfully deleted",
     "progress-reset": "Your progress has been reset",
@@ -776,7 +807,6 @@
     "cert-claim-success": "@{{username}}, you have successfully claimed the {{name}} Certification! Congratulations on behalf of the freeCodeCamp.org team!",
     "wrong-name": "Something went wrong with the verification of {{name}}, please try again. If you continue to receive this error, you can send a message to support@freeCodeCamp.org to get help.",
     "error-claiming": "Error claiming {{certName}}",
-    "refresh-needed": "You can only use the PaymentRequest button once. Refresh the page to start over.",
     "username-not-found": "We could not find a user with the username \"{{username}}\"",
     "add-name": "This user needs to add their name to their account in order for others to be able to view their certification.",
     "not-eligible": "This user is not eligible for freeCodeCamp.org certifications at this time.",
@@ -860,7 +890,8 @@
     "own-work-url": "Remember to submit your own work.",
     "publicly-visible-url": "Remember to submit a publicly visible app URL.",
     "ms-learn-link": "Please use a valid Microsoft Learn trophy link.",
-    "path-url": "You probably want to submit the root path i.e. https://example.com, not https://example.com/path"
+    "path-url": "You probably want to submit the root path i.e. https://example.com, not https://example.com/path",
+    "source-code-link-required": "Remember to submit the link to your source code."
   },
   "certification": {
     "executive": "Executive Director, freeCodeCamp.org",
@@ -984,6 +1015,10 @@
       "foundational-c-sharp-with-microsoft": "Foundational C# with Microsoft Certification",
       "A2 English for Developers": "A2 English for Developers",
       "a2-english-for-developers": "A2 English for Developers Certification",
+      "B1 English for Developers": "B1 English for Developers",
+      "b1-english-for-developers": "B1 English for Developers Certification",
+      "Front End Development": "Front End Development",
+      "front-end-development-v9": "Front End Development Certification",
       "Legacy Front End": "Legacy Front End",
       "legacy-front-end": "Legacy Front End Certification",
       "Legacy Back End": "Legacy Back End",

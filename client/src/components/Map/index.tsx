@@ -1,18 +1,21 @@
-import React from 'react';
-import { graphql, useStaticQuery } from 'gatsby';
+import React, { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import {
-  SuperBlockStages,
-  SuperBlocks,
-  superBlockOrder
-} from '../../../../shared/config/superblocks';
+  type SuperBlocks,
+  SuperBlockStage,
+  getStageOrder,
+  superBlockStages
+} from '../../../../shared/config/curriculum';
 import { SuperBlockIcon } from '../../assets/icons/superblock-icon';
 import LinkButton from '../../assets/icons/link-button';
-import { Link, Spacer } from '../helpers';
+import { Spacer, ButtonLink } from '../helpers';
 import { getSuperBlockTitleForMap } from '../../utils/superblock-map-titles';
-import { showUpcomingChanges } from '../../../config/env.json';
+import {
+  showUpcomingChanges,
+  showNewCurriculum
+} from '../../../config/env.json';
 
 import './map.css';
 
@@ -21,13 +24,9 @@ import {
   currentCertsSelector
 } from '../../redux/selectors';
 
-import { RibbonIcon, Arrow } from '../../assets/icons/completion-ribbon';
+import { RibbonIcon } from '../../assets/icons/completion-ribbon';
 
-import {
-  CurrentCert,
-  ClaimedCertifications,
-  AllChallengeNode
-} from '../../redux/prop-types';
+import { CurrentCert, ClaimedCertifications } from '../../redux/prop-types';
 import {
   certSlugTypeMap,
   superBlockCertTypeMap
@@ -40,6 +39,10 @@ interface MapProps {
   currentCerts: CurrentCert[];
   claimedCertifications?: ClaimedCertifications;
   completedChallengeIds: string[];
+  allChallenges: {
+    id: string;
+    superBlock: SuperBlocks;
+  }[];
 }
 
 const linkSpacingStyle = {
@@ -49,11 +52,15 @@ const linkSpacingStyle = {
   gap: '15px'
 };
 
-const coreCurriculum = [
-  ...superBlockOrder[SuperBlockStages.FrontEnd],
-  ...superBlockOrder[SuperBlockStages.Backend],
-  ...superBlockOrder[SuperBlockStages.Python]
-];
+const superBlockHeadings: { [key in SuperBlockStage]: string } = {
+  [SuperBlockStage.Core]: 'landing.core-certs-heading',
+  [SuperBlockStage.English]: 'landing.learn-english-heading',
+  [SuperBlockStage.Professional]: 'landing.professional-certs-heading',
+  [SuperBlockStage.Extra]: 'landing.interview-prep-heading',
+  [SuperBlockStage.Legacy]: 'landing.legacy-curriculum-heading',
+  [SuperBlockStage.New]: '', // TODO: add translation
+  [SuperBlockStage.Upcoming]: 'landing.upcoming-heading'
+};
 
 const mapStateToProps = createSelector(
   isSignedInSelector,
@@ -69,19 +76,17 @@ const mapStateToProps = createSelector(
 function MapLi({
   superBlock,
   landing = false,
-  last = false,
   completed,
   claimed,
-  showArrows = false,
+  showProgressionLines = false,
   showNumbers = false,
   index
 }: {
   superBlock: SuperBlocks;
   landing: boolean;
-  last?: boolean;
   completed: boolean;
   claimed: boolean;
-  showArrows?: boolean;
+  showProgressionLines?: boolean;
   showNumbers?: boolean;
   index: number;
 }) {
@@ -91,25 +96,31 @@ function MapLi({
         data-test-label='curriculum-map-button'
         data-playwright-test-label='curriculum-map-button'
       >
-        <div className='progress-icon'>
-          <RibbonIcon
-            value={index + 1}
-            showNumbers={showNumbers}
-            isCompleted={completed}
-            isClaimed={claimed}
-          />
-        </div>
-        <div className='progression-arrow'>
-          {!last && showArrows && <Arrow />}
+        <div className='progress-icon-wrapper'>
+          <div
+            className={`progress-icon${showProgressionLines ? ' show-progression-lines' : ''}`}
+          >
+            <RibbonIcon
+              value={index + 1}
+              showNumbers={showNumbers}
+              isCompleted={completed}
+              isClaimed={claimed}
+            />
+          </div>
         </div>
 
-        <Link className='btn link-btn btn-lg' to={`/learn/${superBlock}/`}>
+        <ButtonLink
+          block
+          size='large'
+          className='map-superblock-link'
+          href={`/learn/${superBlock}/`}
+        >
           <div style={linkSpacingStyle}>
             <SuperBlockIcon className='map-icon' superBlock={superBlock} />
             {getSuperBlockTitleForMap(superBlock)}
           </div>
           {landing && <LinkButton />}
-        </Link>
+        </ButtonLink>
       </li>
     </>
   );
@@ -119,29 +130,9 @@ function Map({
   forLanding = false,
   isSignedIn,
   currentCerts,
-  completedChallengeIds
+  completedChallengeIds,
+  allChallenges
 }: MapProps): React.ReactElement {
-  const {
-    allChallengeNode: { edges }
-  }: {
-    allChallengeNode: AllChallengeNode;
-  } = useStaticQuery(graphql`
-    query allChallenges {
-      allChallengeNode {
-        edges {
-          node {
-            challenge {
-              id
-              superBlock
-            }
-          }
-        }
-      }
-    }
-  `);
-
-  const allChallenges = edges.map(edge => edge.node.challenge);
-
   const { t } = useTranslation();
 
   const allSuperblockChallengesCompleted = (superblock: SuperBlocks) => {
@@ -169,117 +160,28 @@ function Map({
 
   return (
     <div className='map-ui' data-test-label='curriculum-map'>
-      <h2 className={forLanding ? 'big-heading' : ''}>
-        {t('landing.core-certs-heading')}
-      </h2>
-      <ul>
-        {coreCurriculum.map((superBlock, i) => (
-          <MapLi
-            key={i}
-            superBlock={superBlock}
-            landing={forLanding}
-            index={i}
-            claimed={isClaimed(superBlock)}
-            showArrows={true}
-            showNumbers={true}
-            completed={allSuperblockChallengesCompleted(superBlock)}
-            last={i + 1 == coreCurriculum.length}
-          />
-        ))}
-      </ul>
-      <Spacer size='medium' />
-      <h2 className={forLanding ? 'big-heading' : ''}>
-        {t('landing.learn-english-heading')}
-      </h2>
-      <ul>
-        {superBlockOrder[SuperBlockStages.English].map((superBlock, i) => (
-          <MapLi
-            key={i}
-            superBlock={superBlock}
-            landing={forLanding}
-            completed={allSuperblockChallengesCompleted(superBlock)}
-            claimed={isClaimed(superBlock)}
-            index={i}
-            last={i + 1 == superBlockOrder[SuperBlockStages.English].length}
-          />
-        ))}
-      </ul>
-      <Spacer size='medium' />
-      <h2 className={forLanding ? 'big-heading' : ''}>
-        {t('landing.professional-certs-heading')}
-      </h2>
-      <ul>
-        {superBlockOrder[SuperBlockStages.Professional].map((superBlock, i) => (
-          <MapLi
-            key={i}
-            superBlock={superBlock}
-            landing={forLanding}
-            completed={allSuperblockChallengesCompleted(superBlock)}
-            claimed={isClaimed(superBlock)}
-            index={i}
-            last={
-              i + 1 == superBlockOrder[SuperBlockStages.Professional].length
-            }
-          />
-        ))}
-      </ul>
-      <Spacer size='medium' />
-      <h2 className={forLanding ? 'big-heading' : ''}>
-        {t('landing.interview-prep-heading')}
-      </h2>
-      <ul>
-        {superBlockOrder[SuperBlockStages.Extra].map((superBlock, i) => (
-          <MapLi
-            key={i}
-            superBlock={superBlock}
-            landing={forLanding}
-            completed={allSuperblockChallengesCompleted(superBlock)}
-            claimed={isClaimed(superBlock)}
-            index={i}
-            last={i + 1 == superBlockOrder[SuperBlockStages.Extra].length}
-          />
-        ))}
-      </ul>
-      <Spacer size='medium' />
-      <h2 className={forLanding ? 'big-heading' : ''}>
-        {t('landing.legacy-curriculum-heading')}
-      </h2>
-      <ul>
-        {superBlockOrder[SuperBlockStages.Legacy].map((superBlock, i) => (
-          <MapLi
-            key={i}
-            superBlock={superBlock}
-            landing={forLanding}
-            completed={allSuperblockChallengesCompleted(superBlock)}
-            claimed={isClaimed(superBlock)}
-            index={i}
-            last={i + 1 == superBlockOrder[SuperBlockStages.Legacy].length}
-          />
-        ))}
-      </ul>
-      {showUpcomingChanges && (
-        <>
-          <Spacer size='medium' />
+      {getStageOrder({ showNewCurriculum, showUpcomingChanges }).map(stage => (
+        <Fragment key={stage}>
           <h2 className={forLanding ? 'big-heading' : ''}>
-            {t('landing.upcoming-heading')}
+            {t(superBlockHeadings[stage])}
           </h2>
-          <ul>
-            {superBlockOrder[SuperBlockStages.Upcoming].map((superBlock, i) => (
+          <ul key={stage}>
+            {superBlockStages[stage].map((superblock, i) => (
               <MapLi
-                key={i}
-                superBlock={superBlock}
+                key={superblock}
+                superBlock={superblock}
                 landing={forLanding}
-                completed={allSuperblockChallengesCompleted(superBlock)}
                 index={i}
-                claimed={isClaimed(superBlock)}
-                last={
-                  i + 1 == superBlockOrder[SuperBlockStages.Upcoming].length
-                }
+                claimed={isClaimed(superblock)}
+                showProgressionLines={stage === SuperBlockStage.Core}
+                showNumbers={stage === SuperBlockStage.Core}
+                completed={allSuperblockChallengesCompleted(superblock)}
               />
             ))}
           </ul>
-        </>
-      )}
+          <Spacer size='medium' />
+        </Fragment>
+      ))}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import {
 import type {
   ContextConfigDefault,
   FastifyError,
+  FastifyInstance,
   FastifyReply,
   FastifyRequest,
   RawReplyDefaultExpression,
@@ -14,11 +15,16 @@ import type {
 } from 'fastify';
 import { ResolveFastifyReplyType } from 'fastify/types/type-provider';
 import { differenceInMinutes } from 'date-fns';
-import { isProfane } from 'no-profanity';
+import validator from 'validator';
 
-import { blocklistedUsernames } from '../../../shared/config/constants';
 import { isValidUsername } from '../../../shared/utils/validate';
-import { schemas } from '../schemas';
+import * as schemas from '../schemas';
+import { createAuthToken, isExpired } from '../utils/tokens';
+import { API_LOCATION } from '../utils/env';
+import { getRedirectParams } from '../utils/redirection';
+import { isRestricted } from './helpers/is-restricted';
+
+const { isEmail } = validator;
 
 type WaitMesssageArgs = {
   sentAt: Date | null;
@@ -63,6 +69,35 @@ export const isPictureWithProtocol = (picture?: string): boolean => {
   }
 };
 
+const ALLOWED_DOMAINS_MAP = {
+  githubProfile: ['github.com'],
+  linkedin: ['linkedin.com'],
+  twitter: ['twitter.com', 'x.com']
+};
+
+/**
+ * Validate a social URL.
+ *
+ * @param socialUrl The URL to check.
+ * @param key The key of the allowed socials and domains.
+ * @returns Whether the URL is valid.
+ */
+export const validateSocialUrl = (
+  socialUrl: string,
+  key: keyof typeof ALLOWED_DOMAINS_MAP
+): boolean => {
+  if (!socialUrl) return true;
+
+  try {
+    const url = new URL(socialUrl);
+    const domains = ALLOWED_DOMAINS_MAP[key];
+    const domainAndTld = url.hostname.split('.').slice(-2).join('.');
+    return domains.includes(domainAndTld);
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Plugin for all endpoints related to user settings.
  *
@@ -75,13 +110,6 @@ export const settingRoutes: FastifyPluginCallbackTypebox = (
   _options,
   done
 ) => {
-  // The order matters here, since we want to reject invalid cross site requests
-  // before checking if the user is authenticated.
-  // @ts-expect-error - @fastify/csrf-protection needs to update their types
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  fastify.addHook('onRequest', fastify.csrfProtection);
-  fastify.addHook('onRequest', fastify.authorize);
-
   type CommonResponseSchema = {
     response: { 400: (typeof schemas.updateMyProfileUI.response)[400] };
   };
@@ -146,13 +174,25 @@ export const settingRoutes: FastifyPluginCallbackTypebox = (
           type: 'success'
         } as const;
       } catch (err) {
-        // TODO: send to Sentry
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
     }
   );
+
+  function createUpdateEmailText({ email, id }: { email: string; id: string }) {
+    const encodedEmail = Buffer.from(email).toString('base64');
+    return `Please confirm this email address for freeCodeCamp.org:
+
+${API_LOCATION}/confirm-email?email=${encodedEmail}&token=${id}&emailChange=true
+
+Happy coding!
+
+- The freeCodeCamp.org Team
+`;
+  }
 
   fastify.put(
     '/update-my-email',
@@ -170,6 +210,7 @@ export const settingRoutes: FastifyPluginCallbackTypebox = (
       const user = await fastify.prisma.user.findUniqueOrThrow({
         where: { id: req.user?.id },
         select: {
+          id: true,
           email: true,
           emailVerifyTTL: true,
           newEmail: true,
@@ -183,11 +224,11 @@ export const settingRoutes: FastifyPluginCallbackTypebox = (
       const isOwnEmail = newEmail === currentEmailFormatted;
       if (isOwnEmail && isVerifiedEmail) {
         void reply.code(400);
-        return {
+        return reply.send({
           type: 'info',
           message: `${newEmail} is already associated with this account.
 You can update a new email address instead.`
-        } as const;
+        });
       }
 
       const isResendUpdateToSameEmail =
@@ -198,11 +239,11 @@ You can update a new email address instead.`
 
       if (isResendUpdateToSameEmail && isLinkSentWithinLimitTTL) {
         void reply.code(429);
-        return {
+        return reply.send({
           type: 'info',
           message: `We have already sent an email confirmation request to ${newEmail}.
 ${isLinkSentWithinLimitTTL}`
-        } as const;
+        });
       }
 
       const isEmailAlreadyTaken =
@@ -210,16 +251,16 @@ ${isLinkSentWithinLimitTTL}`
 
       if (isEmailAlreadyTaken && !isOwnEmail) {
         void reply.code(400);
-        return {
+        return reply.send({
           type: 'info',
           message: `${newEmail} is already associated with another account.`
-        } as const;
+        });
       }
 
       // ToDo(MVP): email the new email and wait user to confirm it, before we update the user schema.
       try {
         await fastify.prisma.user.update({
-          where: { id: req.user?.id },
+          where: { id: user.id },
           data: {
             newEmail,
             emailVerified: false,
@@ -237,24 +278,46 @@ ${isLinkSentWithinLimitTTL}`
 
         if (tooManyRequestsMessage) {
           void reply.code(429);
-          return {
+          return reply.send({
             type: 'info',
             message: tooManyRequestsMessage
-          } as const;
+          });
         }
 
+        // Update the emailAuthLinkTTL to ensure we don't send too many emails.
         await fastify.prisma.user.update({
-          where: { id: req.user?.id },
+          where: { id: user.id },
           data: {
             emailAuthLinkTTL: new Date()
           }
         });
 
-        return { message: 'flash.email-valid', type: 'success' } as const;
+        // The auth token is used to confirm that the user owns the email. If
+        // the user provides the correct id (by following the link we send
+        // them), then we can update the email.
+        const { id } = await fastify.prisma.authToken.create({
+          data: createAuthToken(user.id),
+          select: { id: true }
+        });
+
+        await fastify.sendEmail({
+          from: 'team@freecodecamp.org',
+          to: newEmail,
+          subject:
+            'Please confirm your updated email address for freeCodeCamp.org',
+          text: createUpdateEmailText({ email: newEmail, id })
+        });
+
+        await reply.send({
+          message:
+            'Check your email and click the link we sent you to confirm your new email address.',
+          type: 'info'
+        });
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
-        return { message: 'flash.wrong-updating', type: 'danger' } as const;
+        await reply.send({ message: 'flash.wrong-updating', type: 'danger' });
       }
     }
   );
@@ -280,6 +343,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -293,6 +357,18 @@ ${isLinkSentWithinLimitTTL}`
       errorHandler: updateErrorHandler
     },
     async (req, reply) => {
+      const valid = (['twitter', 'githubProfile', 'linkedin'] as const).every(
+        key => validateSocialUrl(req.body[key], key)
+      );
+
+      if (!valid) {
+        void reply.code(400);
+        return reply.send({
+          message: 'flash.wrong-updating',
+          type: 'danger'
+        });
+      }
+
       try {
         await fastify.prisma.user.update({
           where: { id: req.user?.id },
@@ -310,6 +386,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -358,15 +435,12 @@ ${isLinkSentWithinLimitTTL}`
 
         if (!validation.valid) {
           void reply.code(400);
-          return {
+          return reply.send({
             // TODO(Post-MVP): custom validation errors.
             message: `Username ${newUsername} ${validation.error}`,
             type: 'info'
-          } as const;
+          });
         }
-
-        const isUserNameProfane = isProfane(newUsername);
-        const onBlocklist = blocklistedUsernames.includes(newUsername);
 
         const usernameTaken =
           newUsername === oldUsername
@@ -375,12 +449,12 @@ ${isLinkSentWithinLimitTTL}`
                 where: { username: newUsername }
               });
 
-        if (usernameTaken || isUserNameProfane || onBlocklist) {
+        if (usernameTaken || isRestricted(newUsername)) {
           void reply.code(400);
-          return {
+          return reply.send({
             message: 'flash.username-taken',
             type: 'info'
-          } as const;
+          });
         }
 
         await fastify.prisma.user.update({
@@ -391,18 +465,20 @@ ${isLinkSentWithinLimitTTL}`
           }
         });
 
-        return {
+        return reply.send({
           message: 'flash.username-updated',
           type: 'success',
-          username: newUsernameDisplay
-        } as const;
+          variables: { username: newUsernameDisplay }
+        });
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
-        return { message: 'flash.wrong-updating', type: 'danger' } as const;
+        await reply.send({ message: 'flash.wrong-updating', type: 'danger' });
       }
     }
   );
+
   fastify.put(
     '/update-my-about',
     {
@@ -418,7 +494,7 @@ ${isLinkSentWithinLimitTTL}`
             about: req.body.about,
             name: req.body.name,
             location: req.body.location,
-            ...(hasProtocol && { picture: req.body.picture })
+            picture: hasProtocol ? req.body.picture : ''
           }
         });
 
@@ -428,6 +504,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -455,6 +532,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -482,6 +560,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -509,6 +588,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -537,6 +617,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -575,6 +656,7 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(500);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
@@ -611,9 +693,122 @@ ${isLinkSentWithinLimitTTL}`
         } as const;
       } catch (err) {
         fastify.log.error(err);
+        fastify.Sentry.captureException(err);
         void reply.code(403);
         return { message: 'flash.wrong-updating', type: 'danger' } as const;
       }
+    }
+  );
+
+  done();
+};
+
+/**
+ * Plugin for endpoints that redirect if the user is not authenticated.
+ *
+ * @param fastify The Fastify instance.
+ * @param _options Options for the plugin.
+ * @param done Callback to signal that the logic has completed.
+ */
+export const settingRedirectRoutes: FastifyPluginCallbackTypebox = (
+  fastify,
+  _options,
+  done
+) => {
+  const redirectMessage = {
+    type: 'danger',
+    content:
+      'Oops! Something went wrong. Please try again in a moment or contact support@freecodecamp.org if the error persists.'
+  } as const;
+
+  const expirationMessage = {
+    type: 'info',
+    content:
+      'The link to confirm your new email address has expired. Please try again.'
+  } as const;
+
+  const successMessage = {
+    type: 'success',
+    content: 'flash.email-valid'
+  } as const;
+
+  async function updateEmail(
+    fastify: FastifyInstance,
+    { id, email }: { id: string; email: string }
+  ) {
+    await fastify.prisma.user.update({
+      where: { id },
+      data: {
+        email,
+        emailAuthLinkTTL: null,
+        emailVerified: true,
+        emailVerifyTTL: null,
+        newEmail: null
+      }
+    });
+  }
+
+  async function deleteAuthToken(
+    fastify: FastifyInstance,
+    { id }: { id: string }
+  ) {
+    await fastify.prisma.authToken.delete({
+      where: { id }
+    });
+  }
+
+  fastify.get(
+    '/confirm-email',
+    {
+      schema: schemas.confirmEmail,
+      errorHandler(error, request, reply) {
+        if (error.validation) {
+          const { origin } = getRedirectParams(request);
+          void reply.redirectWithMessage(origin, redirectMessage);
+        } else {
+          fastify.errorHandler(error, request, reply);
+        }
+      }
+    },
+    async (req, reply) => {
+      const email = Buffer.from(req.query.email, 'base64').toString();
+
+      const { origin } = getRedirectParams(req);
+      if (!isEmail(email)) {
+        return reply.redirectWithMessage(origin, redirectMessage);
+      }
+
+      const authToken = await fastify.prisma.authToken.findUnique({
+        where: { id: req.query.token }
+      });
+
+      if (!authToken) {
+        return reply.redirectWithMessage(origin, redirectMessage);
+      }
+
+      // TODO(Post-MVP): clean up expired auth tokens.
+      if (isExpired(authToken)) {
+        return reply.redirectWithMessage(origin, expirationMessage);
+      }
+
+      // TODO(Post-MVP): should this fail if it's not the currently signed in
+      // user?
+      const targetUser = await fastify.prisma.user.findUnique({
+        where: { id: authToken.userId }
+      });
+
+      if (targetUser?.newEmail !== email) {
+        return reply.redirectWithMessage(origin, redirectMessage);
+      }
+
+      // TODO(Post-MVP): clean up any other auth tokens for this user once
+      // the email is confirmed.
+      await Promise.all([
+        updateEmail(fastify, { id: targetUser.id, email }),
+        deleteAuthToken(fastify, { id: authToken.id })
+      ]);
+
+      return reply.redirectWithMessage(origin, successMessage);
     }
   );
 
